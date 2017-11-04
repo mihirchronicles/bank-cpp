@@ -105,16 +105,14 @@ void intro();	//introductory screen function
 
 // MAIN
 
-int main() 
+int main()
 {
-
 	char ch;
 	int num;
 	intro();
 	do
 	{
 		system("cls");
-
 		cout<<"\n\n\n\tMAIN MENU";
 		cout<<"\n\n\t01. NEW ACCOUNT";
 		cout<<"\n\n\t02. DEPOSIT AMOUNT";
@@ -126,10 +124,8 @@ int main()
 		cout<<"\n\n\t08. EXIT";
 		cout<<"\n\n\tSelect Your Option (1-8) ";
 		cin>>ch;
-
 		system("cls");
-
-		switch(ch)	
+		switch(ch)
 		{
 		case '1':
 			write_account();
@@ -162,7 +158,10 @@ int main()
 			break;
 		 default :cout<<"\a";
 		}
-	}
+		cin.ignore();
+		cin.get();
+	}while(ch!='8');
+	return 0;
 }
 
 // INTRO FUNCTION
