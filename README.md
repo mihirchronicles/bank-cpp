@@ -1,6 +1,6 @@
-#Bank Program Written in C++
+# Bank Program Written in C++
 
-##Basic Operations:
+## Basic Operations:
 
 1. Create Account
 2. Show Account Details

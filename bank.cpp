@@ -1,6 +1,9 @@
 // HEADER FILE
 
 #include<iostream>
+#include<fstream>
+#include<cctype>
+#include<iomanip>
 using namespace std;
 
 
@@ -164,7 +167,182 @@ int main()
 	return 0;
 }
 
-// INTRO FUNCTION
+// Function To Write in File
+
+void write_account()
+{
+	account ac;
+	ofstream outFile;
+	outFile.open("account.dat",ios::binary|ios::app);
+	ac.create_account();
+	outFile.write(reinterpret_cast<char *> (&ac), sizeof(account));
+	outFile.close();
+}
+
+// Function To Read Specific Record From File
+
+void display_sp(int n)
+{
+	account ac;
+	bool flag=false;
+	ifstream inFile;
+	inFile.open("account.dat",ios::binary);
+	if(!inFile)
+	{
+		cout<<"File could not be open !! Press any Key...";
+		return;
+	}
+	cout<<"\nBALANCE DETAILS\n";
+
+    	while(inFile.read(reinterpret_cast<char *> (&ac), sizeof(account)))
+	{
+		if(ac.returnaccountnumber()==n)
+		{
+			ac.show_account();
+			flag=true;
+		}
+	}
+	inFile.close();
+	if(flag==false)
+		cout<<"\n\nAccount number does not exist";
+}
+
+// Function To Modify Record Of File
+
+void modify_account(int n)
+{
+	bool found=false;
+	account ac;
+	fstream File;
+	File.open("account.dat",ios::binary|ios::in|ios::out);
+	if(!File)
+	{
+		cout<<"File could not be open !! Press any Key...";
+		return;
+	}
+	while(!File.eof() && found==false)
+	{
+		File.read(reinterpret_cast<char *> (&ac), sizeof(account));
+		if(ac.returnaccountnumber()==n)
+		{
+			ac.show_account();
+			cout<<"\n\nEnter The New Details of account"<<endl;
+			ac.modify();
+			int pos=(-1)*static_cast<int>(sizeof(account));
+			File.seekp(pos,ios::cur);
+			File.write(reinterpret_cast<char *> (&ac), sizeof(account));
+			cout<<"\n\n\t Record Updated";
+			found=true;
+		  }
+	}
+	File.close();
+	if(found==false)
+		cout<<"\n\n Record Not Found ";
+}
+
+// Function To Delete Record Of File
+
+void delete_account(int n)
+{
+	account ac;
+	ifstream inFile;
+	ofstream outFile;
+	inFile.open("account.dat",ios::binary);
+	if(!inFile)
+	{
+		cout<<"File could not be open !! Press any Key...";
+		return;
+	}
+	outFile.open("Temp.dat",ios::binary);
+	inFile.seekg(0,ios::beg);
+	while(inFile.read(reinterpret_cast<char *> (&ac), sizeof(account)))
+	{
+		if(ac.returnaccountnumber()!=n)
+		{
+			outFile.write(reinterpret_cast<char *> (&ac), sizeof(account));
+		}
+	}
+	inFile.close();
+	outFile.close();
+	remove("account.dat");
+	rename("Temp.dat","account.dat");
+	cout<<"\n\n\tRecord Deleted ..";
+}
+
+// Function To Display All Accounts Deposit List
+
+void display_all()
+{
+	account ac;
+	ifstream inFile;
+	inFile.open("account.dat",ios::binary);
+	if(!inFile)
+	{
+		cout<<"File could not be open !! Press any Key...";
+		return;
+	}
+	cout<<"\n\n\t\tACCOUNT HOLDER LIST\n\n";
+	cout<<"====================================================\n";
+	cout<<"A/c no.      NAME           Type  Balance\n";
+	cout<<"====================================================\n";
+	while(inFile.read(reinterpret_cast<char *> (&ac), sizeof(account)))
+	{
+		ac.report();
+	}
+	inFile.close();
+}
+
+// Function To Deposit And Withdraw Amounts
+
+void deposit_withdraw(int n, int option)
+{
+	int amt;
+	bool found=false;
+	account ac;
+	fstream File;
+	File.open("account.dat", ios::binary|ios::in|ios::out);
+	if(!File)
+	{
+		cout<<"File could not be open !! Press any Key...";
+		return;
+	}
+	while(!File.eof() && found==false)
+	{
+		File.read(reinterpret_cast<char *> (&ac), sizeof(account));
+		if(ac.returnaccountnumber()==n)
+		{
+			ac.show_account();
+			if(option==1)
+			{
+				cout<<"\n\n\tTO DEPOSITE AMOUNT ";
+				cout<<"\n\nEnter The amount to be deposited";
+				cin>>amt;
+				ac.dep(amt);
+			}
+			if(option==2)
+			{
+				cout<<"\n\n\tTO WITHDRAW AMOUNT ";
+				cout<<"\n\nEnter The amount to be withdraw";
+				cin>>amt;
+				int bal=ac.returndeposit()-amt;
+				if((bal<500 && ac.returntype()=='S') || (bal<1000 && ac.returntype()=='C'))
+					cout<<"Insufficience balance";
+				else
+					ac.draw(amt);
+			}
+			int pos=(-1)*static_cast<int>(sizeof(ac));
+			File.seekp(pos,ios::cur);
+			File.write(reinterpret_cast<char *> (&ac), sizeof(account));
+			cout<<"\n\n\t Record Updated";
+			found=true;
+	       }
+         }
+	File.close();
+	if(found==false)
+		cout<<"\n\n Record Not Found ";
+}
+
+// Intro Function
 void intro()
 {
 	cout<<"\n\n\n\t  BANK";
